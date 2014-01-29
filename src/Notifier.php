@@ -57,11 +57,14 @@ class Notifier implements NotifierInterface
         // Set the rooms array.
         $this->rooms = $rooms;
 
+        // Get room keys.
+        $roomKeys = array_keys($rooms);
+
         // Extract the configuration array.
-        $this->default = isset($config['default']) ? $config['default'] : reset(array_keys($rooms));
+        $this->default = isset($config['default']) ? $config['default'] : $roomKeys[0];
         $this->notify  = isset($config['notify'])  ? $config['notify']  : true;
         $this->color   = isset($config['color'])   ? $config['color']   : 'gray';
-        $this->pretend = isset($config['pretend']) ? $config['pretend'] : true;
+        $this->pretend = isset($config['pretend']) ? $config['pretend'] : false;
     }
 
     /**

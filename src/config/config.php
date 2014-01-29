@@ -7,9 +7,9 @@ return array(
     | Pretend
     |--------------------------------------------------------------------------
     |
-    | Use this switch to turn hipchat notifications on and off. Defaults to true.
+    | Use this switch to turn hipchat notifications on and off. Defaults to false.
     */
-    'pretend' => true,
+    'pretend' => false,
 
     /*
     |--------------------------------------------------------------------------
