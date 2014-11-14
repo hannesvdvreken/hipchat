@@ -12,13 +12,17 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
-        $this->app->bind('hipchat', function ($app) {
-            return new Notifier(
-                $app->make('Guzzle\Http\Client'),
-                $app['config']->get('hipchat::config.rooms'),
-                $app['config']->get('hipchat::config')
-            );
+        // Bind implementation for interface.
+        $this->app->bind('Hipchat\NotifierInterface', function ($app) {
+            $client = $app->make('Guzzle\Http\Client');
+            $rooms = $app['config']->get('hipchat::config.rooms');
+            $options = $app['config']->get('hipchat::config');
+
+            return $app->make('Hipchat\Notifier', [$client, $rooms, $options]);
         });
+
+        // Set alias.
+        $this->app->alias('Hipchat\NotifierInterface', 'hipchat');
     }
 
     /**
