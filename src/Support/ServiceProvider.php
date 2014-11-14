@@ -2,15 +2,13 @@
 namespace Hipchat\Support;
 
 use Hipchat\Notifier;
-use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Illuminate\Foundation\AliasLoader;
+use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider
 {
     /**
      * Register the service provider.
-     *
-     * @return  void
      */
     public function register()
     {
@@ -18,11 +16,10 @@ class ServiceProvider extends BaseServiceProvider
         $package = 'hannesvdvreken/hipchat';
 
         $config->package($package,
-            base_path() . '/vendor/'. $package .'/src/config'
+            base_path().'/vendor/'.$package.'/src/config'
         );
 
-        $this->app->bind('hipchat', function($app) use ($config)
-        {
+        $this->app->bind('hipchat', function ($app) use ($config) {
             return new Notifier(
                 $app->make('Guzzle\Http\Client'),
                 $config->get('hipchat::config.rooms'),
@@ -33,8 +30,6 @@ class ServiceProvider extends BaseServiceProvider
 
     /**
      * Register an Alias for the Facade
-     *
-     * @return void
      */
     public function boot()
     {

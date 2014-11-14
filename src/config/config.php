@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
 
     /*
     |--------------------------------------------------------------------------
@@ -30,14 +30,14 @@ return array(
     */
     'default' => 'main',
 
-    'rooms' => array(
+    'rooms' => [
 
-        'main' => array(
+        'main' => [
             'room_id'    => 'your-room-id',
             'auth_token' => 'your-room-token',
-        ),
+        ],
 
-    ),
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -48,6 +48,6 @@ return array(
     | 'yellow', 'red', 'green', 'purple', 'gray' and 'random'. Default to 'gray'
     |
     */
-   
+
     'color' => 'gray',
-);
+];

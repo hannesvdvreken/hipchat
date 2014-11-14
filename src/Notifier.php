@@ -6,53 +6,52 @@ use Guzzle\Http\Client;
 class Notifier implements NotifierInterface
 {
     /**
-     * @var  string
+     * @var string
      */
     protected $default;
 
     /**
-     * @var  string
+     * @var string
      */
     protected $notify;
 
     /**
-     * @var  string
+     * @var string
      */
     protected $color;
 
     /**
-     * @var  boolean
+     * @var boolean
      */
     protected $pretend;
 
     /**
-     * @var  array
+     * @var array
      */
     protected $rooms;
 
     /**
-     * @var  array
+     * @var array
      */
-    protected $colors = array('yellow', 'red', 'green', 'purple', 'gray', 'random');
+    protected $colors = ['yellow', 'red', 'green', 'purple', 'gray', 'random'];
 
     /**
-     * @var  Guzzle\Http\Client
+     * @var Client
      */
     protected $client;
 
     /**
      * Public constructor
      *
-     * @param  Guzzle\Http\Client $client
-     * @param  array  $rooms
-     * @param  array  $config
-     * @return Hipchat\NotifierInterface
+     * @param Client $client
+     * @param array  $rooms
+     * @param array  $config
      */
-    public function __construct(Client $client, $rooms, $config = array())
+    public function __construct(Client $client, array $rooms, array $config = [])
     {
         // Configure the HTTP client
         $this->client = $client->setBaseUrl('https://api.hipchat.com/')
-            ->setDefaultOption('headers', array('Content-Type' => 'application/json'));
+            ->setDefaultOption('headers', ['Content-Type' => 'application/json']);
 
         // Set the rooms array.
         $this->rooms = $rooms;
@@ -69,10 +68,10 @@ class Notifier implements NotifierInterface
 
     /**
      * Notify with specified $message.
-     * 
-     * @param  string $message
-     * @param  string $color
-     * @return Hipchat\NotifierInterface
+     *
+     * @param  string            $message
+     * @param  string            $color
+     * @return NotifierInterface
      */
     public function notify($message, $color = null)
     {
@@ -81,33 +80,38 @@ class Notifier implements NotifierInterface
 
     /**
      * Notify with a specified $message in a given $room.
-     * 
-     * @param  string $room
-     * @param  string $message
-     * @param  string $color
+     *
+     * @param  string            $room
+     * @param  string            $message
+     * @param  string            $color
      * @return NotifierInterface
      */
     public function notifyIn($room, $message, $color = null)
     {
         // Don't do any request.
-        if ($this->pretend) return $this;
+        if ($this->pretend) {
+            return $this;
+        }
 
         // Construct POST data.
-        $data = array(
+        $data = [
             'color' => in_array($color, $this->colors) ? $color : $this->color,
             'message' => $message,
             'notify' => $this->notify,
             'message_format' => 'html',
-        );
+        ];
 
         // Get the room settings
         $room = $this->rooms[$room];
 
         // Set authentication
-        $this->client->setDefaultOption('query', array('auth_token' => $room['auth_token']));
+        $this->client->setDefaultOption('query', ['auth_token' => $room['auth_token']]);
+
+        // Build URI.
+        $uri = "/v2/room/{$room['room_id']}/notification";
 
         // Make request.
-        $this->client->post('/v2/room/'. $room['room_id'] .'/notification', null, json_encode($data))->send();
+        $this->client->post($uri, null, json_encode($data))->send();
 
         // Allow chaining.
         return $this;
