@@ -12,18 +12,11 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
-        $config = $this->app['config'];
-        $package = 'hannesvdvreken/hipchat';
-
-        $config->package($package,
-            base_path().'/vendor/'.$package.'/src/config'
-        );
-
-        $this->app->bind('hipchat', function ($app) use ($config) {
+        $this->app->bind('hipchat', function ($app) {
             return new Notifier(
                 $app->make('Guzzle\Http\Client'),
-                $config->get('hipchat::config.rooms'),
-                $config->get('hipchat::config')
+                $app['config']->get('hipchat::config.rooms'),
+                $app['config']->get('hipchat::config')
             );
         });
     }
@@ -33,8 +26,10 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function boot()
     {
+        // Register config folder.
+        $this->app['config']->package('hannesvdvreken/hipchat', __DIR__.'/../config');
+
         // Add an alias for the Facade.
-        $loader = AliasLoader::getInstance();
-        $loader->alias('Hipchat', 'Hipchat\Support\Facades\Hipchat');
+        AliasLoader::getInstance(['Hipchat' => 'Hipchat\Support\Facades\Hipchat'])->register();
     }
 }
