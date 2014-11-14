@@ -14,7 +14,9 @@
     "guzzle/http": "3.8.*"
   },
   "require-dev": {
-    "illuminate/support": "~4.1"
+    "phpspec/phpspec": "~2.1@dev",
+    "illuminate/support": "~4.0",
+    "illuminate/container": "~4.0"
   },
   "autoload": {
     "psr-4": {
