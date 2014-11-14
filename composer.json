@@ -14,12 +14,15 @@
         "guzzle/http": "3.8.*"
     },
     "require-dev": {
-        "illuminate/support": "4.1.*"
+        "illuminate/support": "~4.1"
     },
     "autoload": {
         "psr-4": {
             "Hipchat\\": "src/"
         }
+    },
+    "scripts": {
+        "test": "phpunit"
     },
     "minimum-stability": "dev"
 }
