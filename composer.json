@@ -1,28 +1,28 @@
 {
-    "name": "hannesvdvreken/hipchat",
-    "authors": [
-        {
-            "name": "Hannes Van De Vreken",
-            "email": "vandevreken.hannes@gmail.com"
-        }
-    ],
-    "description": "A notifier class for Hipchat notifications",
-    "license": "MIT",
-    "keywords": ["Hipchat", "nofication", "rooms", "laravel", "ServiceProvider"],
-    "require": {
-        "php": "~5.4",
-        "guzzle/http": "3.8.*"
-    },
-    "require-dev": {
-        "illuminate/support": "~4.1"
-    },
-    "autoload": {
-        "psr-4": {
-            "Hipchat\\": "src/"
-        }
-    },
-    "scripts": {
-        "test": "phpunit"
-    },
-    "minimum-stability": "dev"
+  "name": "hannesvdvreken/hipchat",
+  "authors": [
+    {
+      "name": "Hannes Van De Vreken",
+      "email": "vandevreken.hannes@gmail.com"
+    }
+  ],
+  "description": "A notifier class for Hipchat notifications",
+  "license": "MIT",
+  "keywords": ["Hipchat", "nofication", "rooms", "laravel", "ServiceProvider"],
+  "require": {
+    "php": "~5.4",
+    "guzzle/http": "3.8.*"
+  },
+  "require-dev": {
+    "illuminate/support": "~4.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Hipchat\\": "src/"
+    }
+  },
+  "scripts": {
+    "test": "phpunit"
+  },
+  "minimum-stability": "dev"
 }
