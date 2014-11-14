@@ -1,5 +1,7 @@
 # [Hipchat](https://hipchat.com) notifier
-[![Build Status](https://travis-ci.org/hannesvdvreken/hipchat.png?branch=master)](https://travis-ci.org/hannesvdvreken/hipchat) [![Latest Stable Version](https://poser.pugx.org/hannesvdvreken/hipchat/v/stable.png)](https://packagist.org/packages/hannesvdvreken/hipchat) [![Total Downloads](https://poser.pugx.org/hannesvdvreken/hipchat/downloads.png)](https://packagist.org/packages/hannesvdvreken/hipchat)
+[![Build Status](https://travis-ci.org/hannesvdvreken/hipchat.png?branch=master)](https://travis-ci.org/hannesvdvreken/hipchat)
+[![Latest Stable Version](https://poser.pugx.org/hannesvdvreken/hipchat/v/stable.png)](https://packagist.org/packages/hannesvdvreken/hipchat)
+[![Total Downloads](https://poser.pugx.org/hannesvdvreken/hipchat/downloads.png)](https://packagist.org/packages/hannesvdvreken/hipchat)
 
 ## Usage
 
@@ -7,16 +9,16 @@ Getting started with a *Hello World* example.
 
 ```php
 // Configuration.
-$rooms = array(
-	array(
-		'room_id' => '1234',
-		'auth_token' => '****',
-	),
-);
+$rooms = [
+    [
+        'room_id' => '1234',
+        'auth_token' => '****',
+    ],
+];
 
 // Create the required Guzzle client.
-$client = new \Guzzle\Http\Client;
-$hipchat = new \Hipchat\Notifier($client, $rooms);
+$client = new Guzzle\Http\Client;
+$hipchat = new Hipchat\Notifier($client, $rooms);
 
 // Send the notification.
 $hipchat->notify('Hello world!');
@@ -26,20 +28,20 @@ If you would like to send notification to different rooms, add some to the array
 
 ```php
 // Configuration.
-$rooms = array(
-	'frontenders' => array(
-		'room_id' => '1234',
-		'auth_token' => '****',
-	),
-	'backenders' => array(
-		'room_id' => '5678',
-		'auth_token' => '****',
-	),
-);
+$rooms = [
+    'frontenders' => [
+        'room_id' => '1234',
+        'auth_token' => '****',
+    ],
+    'backenders' => [
+        'room_id' => '5678',
+        'auth_token' => '****',
+    ],
+];
 
 // Create the required Guzzle client.
-$client = new \Guzzle\Http\Client;
-$hipchat = new \Hipchat\Notifier($client, $rooms);
+$client = new Guzzle\Http\Client;
+$hipchat = new Hipchat\Notifier($client, $rooms);
 
 // Send the notification.
 $hipchat->notifyIn('frontenders', 'Hello world!');
@@ -52,12 +54,12 @@ specify which room to use as a default with a third constructor parameter:
 The *constructor* accepts a third parameter with extra options.
 
 ```php
-$config = array(
-	'default' => 'frontenders',
-	'color' => 'gray',
-	'pretend' => true,
-	'notify' => true,
-);
+$config = [
+    'default' => 'frontenders',
+    'color' => 'gray',
+    'pretend' => true,
+    'notify' => true,
+];
 ```
 
 - `default`: The default room to send notifications in with `->notify()`.
