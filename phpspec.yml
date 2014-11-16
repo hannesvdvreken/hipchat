@@ -1,0 +1,6 @@
+suites:
+  hipchat_suite:
+    namespace: Hipchat
+    psr4_prefix: Hipchat
+    src_path: src
+    spec_path: tests
