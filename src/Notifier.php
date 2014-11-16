@@ -50,8 +50,9 @@ class Notifier implements NotifierInterface
     public function __construct(Client $client, array $rooms, array $config = [])
     {
         // Configure the HTTP client
-        $this->client = $client->setBaseUrl('https://api.hipchat.com/')
-            ->setDefaultOption('headers', ['Content-Type' => 'application/json']);
+        $this->client = $client;
+        $this->client->setBaseUrl('https://api.hipchat.com/');
+        $this->client->setDefaultOption('headers', ['Content-Type' => 'application/json']);
 
         // Set the rooms array.
         $this->rooms = $rooms;
