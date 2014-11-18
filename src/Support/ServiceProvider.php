@@ -13,12 +13,8 @@ class ServiceProvider extends BaseServiceProvider
     public function register()
     {
         // Bind implementation for interface.
-        $this->app->bind('Hipchat\NotifierInterface', function ($app) {
-            $client = $app->make('Guzzle\Http\Client');
-            $rooms = $app['config']->get('hipchat::config.rooms');
-            $options = $app['config']->get('hipchat::config');
-
-            return $app->make('Hipchat\Notifier', [$client, $rooms, $options]);
+        $this->app->bind('Hipchat\NotifierInterface', function () {
+            return $this->configureNotifier();
         });
 
         // Set alias.
@@ -35,5 +31,17 @@ class ServiceProvider extends BaseServiceProvider
 
         // Add an alias for the Facade.
         AliasLoader::getInstance(['Hipchat' => 'Hipchat\Support\Facades\Hipchat'])->register();
+    }
+
+    /**
+     * @return Notifier
+     */
+    public function configureNotifier()
+    {
+        $client = $this->app->make('Guzzle\Http\Client');
+        $rooms = $this->app['config']->get('hipchat::config.rooms');
+        $options = $this->app['config']->get('hipchat::config');
+
+        return $this->app->make('Hipchat\Notifier', [$client, $rooms, $options]);
     }
 }
