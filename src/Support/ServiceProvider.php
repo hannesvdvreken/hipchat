@@ -2,8 +2,7 @@
 namespace Hipchat\Support;
 
 use Hipchat\Notifier;
-use Illuminate\Contracts\Config\Repository;
-use Illuminate\Foundation\AliasLoader;
+use Illuminate\Config\Repository;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider

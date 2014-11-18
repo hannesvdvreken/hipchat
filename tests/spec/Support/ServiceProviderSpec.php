@@ -5,7 +5,7 @@ namespace spec\Hipchat\Support;
 use Guzzle\Http\Client;
 use Hipchat\Notifier;
 use Illuminate\Container\Container as Application;
-use Illuminate\Contracts\Config\Repository;
+use Illuminate\Config\Repository;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
