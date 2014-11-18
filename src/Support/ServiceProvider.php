@@ -2,6 +2,7 @@
 namespace Hipchat\Support;
 
 use Hipchat\Notifier;
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
@@ -27,7 +28,7 @@ class ServiceProvider extends BaseServiceProvider
     public function boot()
     {
         // Register config folder.
-        $this->app['config']->package('hannesvdvreken/hipchat', __DIR__.'/../config');
+        $this->config()->package('hannesvdvreken/hipchat', __DIR__.'/../config');
 
         // Add an alias for the Facade.
         AliasLoader::getInstance(['Hipchat' => 'Hipchat\Support\Facades\Hipchat'])->register();
@@ -38,10 +39,22 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function configureNotifier()
     {
+        // Create HTTP Client.
         $client = $this->app->make('Guzzle\Http\Client');
-        $rooms = $this->app['config']->get('hipchat::config.rooms');
-        $options = $this->app['config']->get('hipchat::config');
 
+        // Get some configuration data.
+        $rooms = $this->config()->get('hipchat::config.rooms');
+        $options = $this->config()->get('hipchat::config');
+
+        // Instantiate the Notifier object and return it.
         return $this->app->make('Hipchat\Notifier', [$client, $rooms, $options]);
+    }
+
+    /**
+     * @return Repository
+     */
+    protected function config()
+    {
+        return $this->app->make('config');
     }
 }
