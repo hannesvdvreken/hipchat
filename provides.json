@@ -1,5 +1,11 @@
 {
   "providers": [
     "Hipchat\\Support\\ServiceProvider"
+  ],
+  "aliases": [
+    {
+      "alias": "Hipchat",
+      "facade": "Hipchat\\Support\\Facades\\Hipchat"
+    }
   ]
 }

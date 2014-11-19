@@ -28,9 +28,6 @@ class ServiceProvider extends BaseServiceProvider
     {
         // Register config folder.
         $this->config()->package('hannesvdvreken/hipchat', __DIR__.'/../config');
-
-        // Add an alias for the Facade.
-        AliasLoader::getInstance(['Hipchat' => 'Hipchat\Support\Facades\Hipchat'])->register();
     }
 
     /**
