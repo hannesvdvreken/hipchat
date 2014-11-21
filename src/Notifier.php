@@ -1,7 +1,7 @@
 <?php
 namespace Hipchat;
 
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
 
 class Notifier implements NotifierInterface
 {
@@ -41,6 +41,11 @@ class Notifier implements NotifierInterface
     protected $client;
 
     /**
+     * @var string
+     */
+    private $baseUrl = 'https://api.hipchat.com';
+
+    /**
      * Public constructor
      *
      * @param Client $client
@@ -51,7 +56,6 @@ class Notifier implements NotifierInterface
     {
         // Configure the HTTP client
         $this->client = $client;
-        $this->client->setBaseUrl('https://api.hipchat.com/');
         $this->client->setDefaultOption('headers', ['Content-Type' => 'application/json']);
 
         // Set the rooms array.
@@ -109,10 +113,10 @@ class Notifier implements NotifierInterface
         $this->client->setDefaultOption('query', ['auth_token' => $room['auth_token']]);
 
         // Build URI.
-        $uri = "/v2/room/{$room['room_id']}/notification";
+        $uri = $this->baseUrl . "/v2/room/{$room['room_id']}/notification";
 
         // Make request.
-        $this->client->post($uri, null, json_encode($data))->send();
+        $this->client->post($uri, ['json' => $data]);
 
         // Allow chaining.
         return $this;

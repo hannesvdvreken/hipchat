@@ -36,7 +36,7 @@ class ServiceProvider extends BaseServiceProvider
     public function configureNotifier()
     {
         // Create HTTP Client.
-        $client = $this->app->make('Guzzle\Http\Client');
+        $client = $this->app->make('GuzzleHttp\Client');
 
         // Get some configuration data.
         $rooms = $this->config()->get('hipchat::config.rooms');
