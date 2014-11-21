@@ -2,7 +2,7 @@
 
 namespace spec\Hipchat\Support;
 
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
 use Hipchat\Notifier;
 use Illuminate\Container\Container as Application;
 use Illuminate\Config\Repository;
@@ -42,7 +42,7 @@ class ServiceProviderSpec extends ObjectBehavior
         $app->make('config')->shouldBeCalledTimes(2)->willReturn($config);
         $config->get('hipchat::config.rooms')->shouldBeCalled()->willReturn($rooms);
         $config->get('hipchat::config')->shouldBeCalled()->willReturn($options);
-        $app->make('Guzzle\Http\Client')->shouldBeCalled()->willReturn($client);
+        $app->make('GuzzleHttp\Client')->shouldBeCalled()->willReturn($client);
         $app->make('Hipchat\Notifier', [$client, $rooms, $options])->shouldBeCalled()->willReturn($notifier);
 
         // Test hypotheses.
