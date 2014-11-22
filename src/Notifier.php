@@ -113,12 +113,22 @@ class Notifier implements NotifierInterface
         $this->client->setDefaultOption('query', ['auth_token' => $room['auth_token']]);
 
         // Build URI.
-        $uri = $this->baseUrl . "/v2/room/{$room['room_id']}/notification";
+        $uri = $this->getRoomNotificationUrl($room);
 
         // Make request.
         $this->client->post($uri, ['json' => $data]);
 
         // Allow chaining.
         return $this;
+    }
+
+    /**
+     * @param $room
+     *
+     * @return string
+     */
+    protected function getRoomNotificationUrl($room)
+    {
+        return "{$this->baseUrl}/v2/room/{$room['room_id']}/notification";
     }
 }
