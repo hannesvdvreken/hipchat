@@ -66,16 +66,17 @@ class Notifier implements NotifierInterface
 
         // Extract the configuration array.
         $this->default = isset($config['default']) ? $config['default'] : $roomKeys[0];
-        $this->notify  = isset($config['notify'])  ? $config['notify']  : true;
-        $this->color   = isset($config['color'])   ? $config['color']   : 'gray';
+        $this->notify  = isset($config['notify']) ? $config['notify'] : true;
+        $this->color   = isset($config['color']) ? $config['color'] : 'gray';
         $this->pretend = isset($config['pretend']) ? $config['pretend'] : false;
     }
 
     /**
      * Notify with specified $message.
      *
-     * @param  string            $message
-     * @param  string            $color
+     * @param  string $message
+     * @param  string $color
+     *
      * @return NotifierInterface
      */
     public function notify($message, $color = null)
@@ -86,9 +87,10 @@ class Notifier implements NotifierInterface
     /**
      * Notify with a specified $message in a given $room.
      *
-     * @param  string            $room
-     * @param  string            $message
-     * @param  string            $color
+     * @param  string $room
+     * @param  string $message
+     * @param  string $color
+     *
      * @return NotifierInterface
      */
     public function notifyIn($room, $message, $color = null)
@@ -100,9 +102,9 @@ class Notifier implements NotifierInterface
 
         // Construct POST data.
         $data = [
-            'color' => in_array($color, $this->colors) ? $color : $this->color,
-            'message' => $message,
-            'notify' => $this->notify,
+            'color'          => in_array($color, $this->colors) ? $color : $this->color,
+            'message'        => $message,
+            'notify'         => $this->notify,
             'message_format' => 'html',
         ];
 
