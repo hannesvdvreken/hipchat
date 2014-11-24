@@ -2,6 +2,7 @@
 namespace Hipchat\Support;
 
 use Hipchat\Notifier;
+use Hipchat\Room;
 use Illuminate\Config\Repository;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
@@ -43,7 +44,17 @@ class ServiceProvider extends BaseServiceProvider
         $options = $this->config()->get('hipchat::config');
 
         // Instantiate the Notifier object and return it.
-        return $this->app->make('Hipchat\Notifier', [$client, $rooms, $options]);
+        $notifier = $this->app->make('Hipchat\Notifier', [$client, $options]);
+
+        // Configure all rooms.
+        array_walk($rooms, function (&$room, $name) use ($notifier) {
+            $room = new Room($room['room_id'], $name, $room['auth_token']);
+
+            $notifier->addRoom($room);
+        });
+
+        // Return the configured notifier.
+        return $notifier;
     }
 
     /**

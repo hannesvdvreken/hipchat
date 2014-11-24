@@ -2,14 +2,11 @@
 namespace Hipchat;
 
 use GuzzleHttp\Client;
+use InvalidArgumentException;
+use SebastianBergmann\Exporter\Exception;
 
 class Notifier implements NotifierInterface
 {
-    /**
-     * @var string
-     */
-    protected $default;
-
     /**
      * @var string
      */
@@ -43,45 +40,43 @@ class Notifier implements NotifierInterface
     /**
      * @var string
      */
+    const GRAY = 'gray';
+
+    /**
+     * @var string
+     */
     private $baseUrl = 'https://api.hipchat.com';
 
     /**
      * Public constructor
      *
-     * @param Client $client
-     * @param array  $rooms
-     * @param array  $config
+     * @param Client     $client
+     * @param array      $config
+     * @param array|Room $rooms
      */
-    public function __construct(Client $client, array $rooms, array $config = [])
+    public function __construct(Client $client, array $config = [], $rooms = [])
     {
         // Configure the HTTP client
-        $this->client = $client;
-        $this->client->setDefaultOption('headers', ['Content-Type' => 'application/json']);
+        $this->setClient($client);
+        $this->setDefaultOptions($config);
 
         // Set the rooms array.
-        $this->rooms = $rooms;
-
-        // Get room keys.
-        $roomKeys = array_keys($rooms);
-
-        // Extract the configuration array.
-        $this->default = isset($config['default']) ? $config['default'] : $roomKeys[0];
-        $this->notify  = isset($config['notify']) ? $config['notify'] : true;
-        $this->color   = isset($config['color']) ? $config['color'] : 'gray';
-        $this->pretend = isset($config['pretend']) ? $config['pretend'] : false;
+        foreach (is_array($rooms) ? $rooms : [$rooms] as $room) {
+            $this->addRoom($room);
+        }
     }
 
     /**
      * Notify with specified $message.
      *
      * @param  string $message
-     * @param  string $color
+     * @param  array  $options
      *
      * @return NotifierInterface
      */
-    public function notify($message, $color = null)
+    public function notify($message, array $options = [])
     {
-        return $this->notifyIn($this->default, $message, $color);
+        return $this->notifyIn($this->defaultRoom(), $message, $options);
     }
 
     /**
@@ -89,48 +84,148 @@ class Notifier implements NotifierInterface
      *
      * @param  string $room
      * @param  string $message
-     * @param  string $color
+     * @param  array  $options
      *
      * @return NotifierInterface
      */
-    public function notifyIn($room, $message, $color = null)
+    public function notifyIn($room, $message, array $options = [])
     {
         // Don't do any request.
-        if ($this->pretend) {
+        if ($this->getOption('pretend', $options)) {
             return $this;
         }
 
         // Construct POST data.
-        $data = [
-            'color'          => in_array($color, $this->colors) ? $color : $this->color,
+        $json = [
             'message'        => $message,
-            'notify'         => $this->notify,
             'message_format' => 'html',
+            'color'          => $this->getOption('color', $options),
+            'notify'         => $this->getOption('notify', $options),
         ];
 
         // Get the room settings
-        $room = $this->rooms[$room];
+        $room = $this->getRoom($room);
 
         // Set authentication
-        $this->client->setDefaultOption('query', ['auth_token' => $room['auth_token']]);
+        $query = ['auth_token' => $room->token()];
 
         // Build URI.
         $uri = $this->getRoomNotificationUrl($room);
 
         // Make request.
-        $this->client->post($uri, ['json' => $data]);
+        $this->client->post($uri, compact('json', 'query'));
 
         // Allow chaining.
         return $this;
     }
 
     /**
-     * @param $room
+     * @param Client $client
+     *
+     * @return $this
+     */
+    public function setClient(Client $client)
+    {
+        // Assign the client.
+        $this->client = $client;
+        $this->client->setDefaultOption('headers', ['Content-Type' => 'application/json']);
+
+        // Allow chaining.
+        return $this;
+    }
+
+    /**
+     * @return Client
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
+     * @param Room $room
+     *
+     * @return $this
+     */
+    public function addRoom(Room $room)
+    {
+        $this->rooms[$room->name()] = $room;
+
+        // Allow chaining
+        return $this;
+    }
+
+    /**
+     * @param Room $room
+     *
+     * @return $this
+     */
+    public function deleteRoom(Room $room)
+    {
+        // Remove it from the array of rooms.
+        $this->rooms = array_diff($this->rooms, [$room]);
+
+        // Allow chaining
+        return $this;
+    }
+
+    /**
+     * @param Room $room
      *
      * @return string
      */
-    protected function getRoomNotificationUrl($room)
+    protected function getRoomNotificationUrl(Room $room)
     {
-        return "{$this->baseUrl}/v2/room/{$room['room_id']}/notification";
+        return "{$this->baseUrl}/v2/room/{$room->id()}/notification";
+    }
+
+    /**
+     * @param array $config
+     */
+    protected function setDefaultOptions(array $config)
+    {
+        $this->notify  = isset($config['notify']) ? $config['notify'] : true;
+        $this->color   = isset($config['color']) ? $config['color'] : self::GRAY;
+        $this->pretend = isset($config['pretend']) ? $config['pretend'] : false;
+    }
+
+    /**
+     * @param string $option
+     * @param array  $options
+     *
+     * @return string
+     */
+    private function getOption($option, array $options)
+    {
+        return isset($options[$option]) ? $options[$option] : $this->$option;
+    }
+
+    /**
+     * @param Room|string $room
+     *
+     * @return Room
+     */
+    private function getRoom($room)
+    {
+        // This is great!
+        if ($room instanceof Room) {
+            return $room;
+        }
+
+        // Get the room object.
+        if (array_key_exists($room, $this->rooms)) {
+            return $this->rooms[$room];
+        }
+
+        // This was not part of the deal.
+        throw new InvalidArgumentException("$room is not a valid argument. No such room found.");
+    }
+
+    /**
+     * @return Room
+     */
+    private function defaultRoom()
+    {
+        return reset($this->rooms);
     }
 }
