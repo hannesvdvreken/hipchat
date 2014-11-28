@@ -7,6 +7,7 @@ use Hipchat\Notifier;
 use Hipchat\Room;
 use Illuminate\Container\Container as Application;
 use Illuminate\Config\Repository;
+use Illuminate\Support\Facades\App;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -54,5 +55,22 @@ class ServiceProviderSpec extends ObjectBehavior
 
         // Test hypotheses.
         $this->configureNotifier()->shouldReturn($notifier);
+    }
+
+    function it_should_register_config_files(Application $app, Repository $config)
+    {
+        // Variables.
+        $packageName = 'hannesvdvreken/hipchat';
+
+        // Make sure this also works on different testing boxes.
+        $directory = substr(__DIR__, 0, -strlen('tests/spec/Support'));
+        $path = $directory . 'src/Support/../config';
+
+        // Define predictions.
+        $app->make('config')->shouldBeCalled()->willReturn($config);
+        $config->package($packageName, $path)->shouldBeCalled();
+
+        // Test hypotheses.
+        $this->boot();
     }
 }
