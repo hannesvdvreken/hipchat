@@ -4,6 +4,7 @@ namespace spec\Hipchat\Support;
 
 use GuzzleHttp\Client;
 use Hipchat\Notifier;
+use Hipchat\Room;
 use Illuminate\Container\Container as Application;
 use Illuminate\Config\Repository;
 use PhpSpec\ObjectBehavior;
@@ -32,10 +33,14 @@ class ServiceProviderSpec extends ObjectBehavior
         Application $app,
         Repository $config,
         Client $client,
+        Room $room,
         Notifier $notifier
     ) {
         // Setup
-        $rooms = ['default' => 'configuration data'];
+        $id = 1234;
+        $token = '4cc3sst0k3n';
+        $name = 'default';
+        $rooms = [$name => ['room_id' => $id, 'auth_token' => $token]];
         $options = ['options' => 'data'];
 
         // Make predictions
@@ -43,7 +48,9 @@ class ServiceProviderSpec extends ObjectBehavior
         $config->get('hipchat::config.rooms')->shouldBeCalled()->willReturn($rooms);
         $config->get('hipchat::config')->shouldBeCalled()->willReturn($options);
         $app->make('GuzzleHttp\Client')->shouldBeCalled()->willReturn($client);
-        $app->make('Hipchat\Notifier', [$client, $rooms, $options])->shouldBeCalled()->willReturn($notifier);
+        $app->make('Hipchat\Room', [$id, $name, $token])->shouldBeCalled()->willReturn($room);
+        $app->make('Hipchat\Notifier', [$client, $options])->shouldBeCalled()->willReturn($notifier);
+        $notifier->addRoom($room)->shouldBeCalled()->willReturn($notifier);
 
         // Test hypotheses.
         $this->configureNotifier()->shouldReturn($notifier);

@@ -47,11 +47,10 @@ class ServiceProvider extends BaseServiceProvider
         $notifier = $this->app->make('Hipchat\Notifier', [$client, $options]);
 
         // Configure all rooms.
-        array_walk($rooms, function (&$room, $name) use ($notifier) {
-            $room = new Room($room['room_id'], $name, $room['auth_token']);
-
+        foreach ($rooms as $name => $room) {
+            $room = $this->app->make('Hipchat\Room', [$room['room_id'], $name, $room['auth_token']]);
             $notifier->addRoom($room);
-        });
+        }
 
         // Return the configured notifier.
         return $notifier;
