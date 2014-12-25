@@ -108,4 +108,4 @@ compliant as possible.
 
 ## License
 
-MIT
+[MIT](license)
