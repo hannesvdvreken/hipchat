@@ -4,6 +4,7 @@ namespace Hipchat;
 use GuzzleHttp\Client;
 use InvalidArgumentException;
 use SebastianBergmann\Exporter\Exception;
+use SplObjectStorage;
 
 class Notifier implements NotifierInterface
 {
@@ -23,7 +24,7 @@ class Notifier implements NotifierInterface
     protected $pretend;
 
     /**
-     * @var array
+     * @var SplObjectStorage
      */
     protected $rooms;
 
@@ -61,6 +62,8 @@ class Notifier implements NotifierInterface
         $this->setDefaultOptions($config);
 
         // Set the rooms array.
+        $this->rooms = new SplObjectStorage();
+
         foreach (is_array($rooms) ? $rooms : [$rooms] as $room) {
             $this->addRoom($room);
         }
@@ -149,7 +152,7 @@ class Notifier implements NotifierInterface
      */
     public function addRoom(Room $room)
     {
-        $this->rooms[$room->name()] = $room;
+        $this->rooms->attach($room);
 
         // Allow chaining
         return $this;
@@ -162,8 +165,7 @@ class Notifier implements NotifierInterface
      */
     public function deleteRoom(Room $room)
     {
-        // Remove it from the array of rooms.
-        $this->rooms = array_diff($this->rooms, [$room]);
+        $this->rooms->detach($room);
 
         // Allow chaining
         return $this;
@@ -208,14 +210,21 @@ class Notifier implements NotifierInterface
     private function getRoom($room)
     {
         // This is great!
-        if ($room instanceof Room) {
+        if ($room instanceof Room && $this->rooms->contains($room)) {
             return $room;
         }
 
-        // Get the room object.
-        if (array_key_exists($room, $this->rooms)) {
-            return $this->rooms[$room];
+        /** @var Room $item */
+        foreach ($this->rooms as &$item) {
+            if ($item->name() === $room) {
+                $room = $item;
+                break;
+            }
         }
+
+        // Reset the iterator first.
+        $this->rooms->rewind();
+        return $room;
 
         // This was not part of the deal.
         throw new InvalidArgumentException("$room is not a valid argument. No such room found.");
@@ -226,6 +235,6 @@ class Notifier implements NotifierInterface
      */
     private function defaultRoom()
     {
-        return reset($this->rooms);
+        return $this->rooms->current();
     }
 }
