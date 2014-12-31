@@ -11,7 +11,7 @@
   "keywords": ["Hipchat", "nofication", "rooms", "laravel", "ServiceProvider"],
   "require": {
     "php": "~5.4",
-    "guzzle/http": "3.8.*"
+    "guzzlehttp/guzzle": "~4|~5"
   },
   "require-dev": {
     "phpspec/phpspec": "~2.1@dev",

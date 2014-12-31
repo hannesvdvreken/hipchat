@@ -2,6 +2,7 @@
 namespace Hipchat\Support;
 
 use Hipchat\Notifier;
+use Hipchat\Room;
 use Illuminate\Config\Repository;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
@@ -36,14 +37,23 @@ class ServiceProvider extends BaseServiceProvider
     public function configureNotifier()
     {
         // Create HTTP Client.
-        $client = $this->app->make('Guzzle\Http\Client');
+        $client = $this->app->make('GuzzleHttp\Client');
 
         // Get some configuration data.
         $rooms = $this->config()->get('hipchat::config.rooms');
         $options = $this->config()->get('hipchat::config');
 
         // Instantiate the Notifier object and return it.
-        return $this->app->make('Hipchat\Notifier', [$client, $rooms, $options]);
+        $notifier = $this->app->make('Hipchat\Notifier', [$client, $options]);
+
+        // Configure all rooms.
+        foreach ($rooms as $name => $room) {
+            $room = $this->app->make('Hipchat\Room', [$room['room_id'], $name, $room['auth_token']]);
+            $notifier->addRoom($room);
+        }
+
+        // Return the configured notifier.
+        return $notifier;
     }
 
     /**

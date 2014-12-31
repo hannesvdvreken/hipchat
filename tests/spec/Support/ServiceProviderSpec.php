@@ -2,10 +2,12 @@
 
 namespace spec\Hipchat\Support;
 
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
 use Hipchat\Notifier;
+use Hipchat\Room;
 use Illuminate\Container\Container as Application;
 use Illuminate\Config\Repository;
+use Illuminate\Support\Facades\App;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -32,20 +34,43 @@ class ServiceProviderSpec extends ObjectBehavior
         Application $app,
         Repository $config,
         Client $client,
+        Room $room,
         Notifier $notifier
     ) {
         // Setup
-        $rooms = ['default' => 'configuration data'];
+        $id = 1234;
+        $token = '4cc3sst0k3n';
+        $name = 'default';
+        $rooms = [$name => ['room_id' => $id, 'auth_token' => $token]];
         $options = ['options' => 'data'];
 
         // Make predictions
         $app->make('config')->shouldBeCalledTimes(2)->willReturn($config);
         $config->get('hipchat::config.rooms')->shouldBeCalled()->willReturn($rooms);
         $config->get('hipchat::config')->shouldBeCalled()->willReturn($options);
-        $app->make('Guzzle\Http\Client')->shouldBeCalled()->willReturn($client);
-        $app->make('Hipchat\Notifier', [$client, $rooms, $options])->shouldBeCalled()->willReturn($notifier);
+        $app->make('GuzzleHttp\Client')->shouldBeCalled()->willReturn($client);
+        $app->make('Hipchat\Room', [$id, $name, $token])->shouldBeCalled()->willReturn($room);
+        $app->make('Hipchat\Notifier', [$client, $options])->shouldBeCalled()->willReturn($notifier);
+        $notifier->addRoom($room)->shouldBeCalled()->willReturn($notifier);
 
         // Test hypotheses.
         $this->configureNotifier()->shouldReturn($notifier);
+    }
+
+    function it_should_register_config_files(Application $app, Repository $config)
+    {
+        // Variables.
+        $packageName = 'hannesvdvreken/hipchat';
+
+        // Make sure this also works on different testing boxes.
+        $directory = substr(__DIR__, 0, -strlen('tests/spec/Support'));
+        $path = $directory . 'src/Support/../config';
+
+        // Define predictions.
+        $app->make('config')->shouldBeCalled()->willReturn($config);
+        $config->package($packageName, $path)->shouldBeCalled();
+
+        // Test hypotheses.
+        $this->boot();
     }
 }

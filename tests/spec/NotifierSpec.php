@@ -2,7 +2,7 @@
 
 namespace spec\Hipchat;
 
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
